@@ -2,9 +2,19 @@ import { View, Text, StatusBar, SafeAreaView, Image, TextInput, StyleSheet, Pres
 import React, { useState } from 'react'
 import Button from '../components/Button';
 import Input from '../components/input';
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { showMessage, hideMessage } from "react-native-flash-message";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from '../../App';
+import {
+    addDoc,
+    collection,
+    getDoc,
+    doc,
+    onSnapshot,
+    query,
+    where
+} from "firebase/firestore"
 
-const auth = getAuth();
 
 const genderOptions = ["Male", "Female"];
 
@@ -15,27 +25,37 @@ export default function Signup({ navigation }) {
     const [name, setName] = useState("");
     const [age, setAge] = useState("");
 
-    const signup = () => {
-        console.log("clicked")
-        createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                // Signed in 
-                const user = userCredential.user;
-                console.log("user>>", user)
-                // ...
+    const signup = async () => {
+        try {
+            // Create user
+            const result = await createUserWithEmailAndPassword(auth, email, password);
+            // create user profile
+            await addDoc(collection(db, 'users'), {
+                name: name,
+                email: email,
+                age: age,
+                gender: gender,
+                uid: result.user.uid
             })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                // ..
+        }
+        catch (error) {
+            console.log("error--->", error);
+            showMessage({
+                message: "Simple message",
+                type: "danger",
             });
+        };
     }
 
     return (
         <SafeAreaView style={{ marginTop: StatusBar.currentHeight, flex: 1 }}>
             <ScrollView>
                 <View style={{ paddingHorizontal: 18, paddingVertical: 26 }}>
-                    <Input placeholder='email address' onChangeText={(text) => setEmail(text)} />
+                    <Input
+                        placeholder='email address'
+                        autoCapitalize="none"
+                        onChangeText={(text) => setEmail(text)}
+                    />
                     <Input
                         placeholder='password'
                         secureTextEntry
