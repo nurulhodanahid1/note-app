@@ -1,4 +1,4 @@
-import { View, Text, StatusBar, SafeAreaView, Image, TextInput, StyleSheet, Pressable, ScrollView } from 'react-native'
+import { View, Text, StatusBar, SafeAreaView, Image, TextInput, StyleSheet, Pressable, ScrollView, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import Button from '../components/Button';
 import Input from '../components/input';
@@ -24,8 +24,10 @@ export default function Signup({ navigation }) {
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
     const [age, setAge] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const signup = async () => {
+        setLoading(true);
         try {
             // Create user
             const result = await createUserWithEmailAndPassword(auth, email, password);
@@ -37,6 +39,7 @@ export default function Signup({ navigation }) {
                 gender: gender,
                 uid: result.user.uid
             })
+            setLoading(false)
         }
         catch (error) {
             console.log("error--->", error);
@@ -44,8 +47,17 @@ export default function Signup({ navigation }) {
                 message: "Simple message",
                 type: "danger",
             });
+            setLoading(false);
         };
     }
+
+    if (loading){
+        return (
+          <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <ActivityIndicator color="blue" size="large" />
+          </View>
+        )
+      }
 
     return (
         <SafeAreaView style={{ marginTop: StatusBar.currentHeight, flex: 1 }}>
@@ -53,7 +65,7 @@ export default function Signup({ navigation }) {
                 <View style={{ paddingHorizontal: 18, paddingVertical: 26 }}>
                     <Input
                         placeholder='email address'
-                        autoCapitalize="none"
+                        autoCapitalize={"none"}
                         onChangeText={(text) => setEmail(text)}
                     />
                     <Input
@@ -61,7 +73,7 @@ export default function Signup({ navigation }) {
                         secureTextEntry
                         onChangeText={(text) => setPassword(text)}
                     />
-                    <Input placeholder='full name' onChangeText={(text) => setName(text)} />
+                    <Input placeholder='full name' autoCapitalize={"words"} onChangeText={(text) => setName(text)} />
                     <Input placeholder='age' onChangeText={(text) => setAge(text)} />
                     <View style={{ marginVertical: 10 }}>
                         <Text>Select Gender</Text>
