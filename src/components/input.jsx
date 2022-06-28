@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TextInput } from 'react-native'
 import React from 'react'
 
-export default function Input({ placeholder, secureTextEntry, onChangeText, autoCapitalize, multiline}) {
+export default function Input({ placeholder, secureTextEntry, onChangeText, autoCapitalize, multiline, value}) {
   return (
     <TextInput
       style={styles.input}
@@ -10,6 +10,7 @@ export default function Input({ placeholder, secureTextEntry, onChangeText, auto
       onChangeText={onChangeText}
       autoCapitalize={autoCapitalize}
       multiline={multiline}
+      value={value}
     />
   )
 }

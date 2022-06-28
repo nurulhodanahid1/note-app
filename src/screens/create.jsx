@@ -16,7 +16,7 @@ import { showMessage } from 'react-native-flash-message';
 
 const noteColorOptions = ["red", "blue", "green"];
 
-export default function Create({ navigation, router, user }) {
+export default function Create({ navigation, route, user }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [noteColor, setNoteColor] = useState("blue");
