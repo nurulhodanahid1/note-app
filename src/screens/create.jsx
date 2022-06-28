@@ -1,38 +1,48 @@
-import { View, Text, Pressable, StyleSheet } from 'react-native'
+import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import Input from '../components/input';
 import Button from '../components/Button';
 import { auth, db } from '../../App';
 import {
-    addDoc,
-    collection,
-    getDoc,
-    doc,
-    onSnapshot,
-    query,
-    where
+  addDoc,
+  collection,
+  getDoc,
+  doc,
+  onSnapshot,
+  query,
+  where
 } from "firebase/firestore"
+import { showMessage } from 'react-native-flash-message';
 
 const noteColorOptions = ["red", "blue", "green"];
 
-export default function Create({navigation, router, user}) {
+export default function Create({ navigation, router, user }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [noteColor, setNoteColor] = useState("blue");
+  const [loading, setLoading] = useState(false);
 
   const onPressCreate = async () => {
-        try {
-            // create note
-            await addDoc(collection(db, 'notes'), {
-                title: title,
-                description: description,
-                color: noteColor,
-                uid: user.uid
-            })
-        }
-        catch (error) {
-            console.log("error--->", error);
-        };
+    setLoading(true);
+    try {
+      // create note
+      await addDoc(collection(db, 'notes'), {
+        title: title,
+        description: description,
+        color: noteColor,
+        uid: user.uid
+      })
+      setLoading(false)
+      showMessage({
+        message: "note crated successfully",
+        type: "success"
+      })
+      navigation.goBack();
+    }
+    catch (error) {
+      console.log("error--->", error);
+      setLoading(false);
+    };
   }
 
   return (
@@ -62,41 +72,48 @@ export default function Create({navigation, router, user}) {
           )
         })
       }
-      <Button onPress={onPressCreate} title={"Create"} customStyles={{ alignSelf: "center", marginTop: 50, width: "90%" }} />
+      {
+        loading ?
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <ActivityIndicator color="blue" size="large" />
+          </View> :
+          <Button onPress={onPressCreate} title={"Create"} customStyles={{ alignSelf: "center", marginTop: 50, width: "90%" }} />
+      }
+
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   radioContainer: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
   },
   outerCircle: {
-      height: 30,
-      width: 30,
-      borderRadius: 15,
-      borderWidth: 1,
-      borderColor: "#cfcfcf",
-      justifyContent: "center",
-      alignItems: "center",
+    height: 30,
+    width: 30,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "#cfcfcf",
+    justifyContent: "center",
+    alignItems: "center",
   },
   innerCircle: {
-      height: 15,
-      width: 15,
-      borderRadius: 7.5,
-      borderWidth: 1,
-      borderColor: "#cfcfcf"
+    height: 15,
+    width: 15,
+    borderRadius: 7.5,
+    borderWidth: 1,
+    borderColor: "#cfcfcf"
   },
   radioText: {
-      marginLeft: 10,
+    marginLeft: 10,
   },
   selectedOuterCircle: {
-      borderColor: "orange",
+    borderColor: "orange",
   },
   selectedInnerCircle: {
-      borderColor: "orange",
-      backgroundColor: "orange",
+    borderColor: "orange",
+    backgroundColor: "orange",
   }
 });
